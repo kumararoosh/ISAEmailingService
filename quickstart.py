@@ -3,6 +3,7 @@ from cmath import log
 from crypt import methods
 from email.message import Message
 from email.mime import base
+from email.mime import image
 from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
@@ -76,11 +77,13 @@ def main():
 
         # create the QR code
         url = pyqrcode.create("google.com")
-        url.png("temp.png", scale=10)
-
+        imageName = request.form['uuid'] + ".png"
+        url.png(imageName, scale=10)
         message = create_message_with_attachment("kumararoosh@gmail.com", 
-        request.form['email'], "Diya Ticket: " + request.form['name'], body, "temp.png")
+        request.form['email'], "Diya Ticket: " + request.form['name'], body, imageName)
         send_message(service, "me", message)
+        
+        os.remove(imageName)
 
     except HttpError as error:
         # TODO(developer) - Handle errors from gmail API.
