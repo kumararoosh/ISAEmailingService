@@ -2,6 +2,7 @@ from __future__ import print_function
 from cmath import log
 from crypt import methods
 from email.message import Message
+import email.encoders
 from email.mime import base
 from email.mime import image
 from email.mime.base import MIMEBase
@@ -70,17 +71,29 @@ def main():
         
 
 
-        body = ("Hi " + request.form['name'] + ",\n\nThank you for purchasing a ticket to Diya! Attached is your ticket to the event! "
-        "We will see you on November 5th at 9 pm!\n\n"
-        "Thank you for purchasing and we hope you enjoy the event!\n"
-        "Aroosh Kumar - President")
+        body = ("Hi " + request.form['name'] + ",<br/><br/> Thank you for purchasing a ticket to Diya!<br/>"
+        "Diya will take place on November 5th from 9 PM to 12:30 AM! "
+        "Our event will be at <a href=\"https://goo.gl/maps/UQxArPCTKEWTHQKh8\">First & Bell</a><br/>"
+        "Please take note and read through the Disclaimer provided. Your ticket is the attached QR Code.<br/>"
+        "Thank you for purchasing and we hope you enjoy the event!<br/>"
+        "--<br/>"
+        "<b>2022-2023 Indian Student Association Executive Officers</b><br/><br/>"
+        "<b>President --</b> Aroosh Kumar<br/>"
+        "<b>Vice Presidents --</b> Akriti Shrivastava & Krithika Satish<br/>"
+        "<b>Secretary --</b> Shrey Kharbanda<br/>"
+        "<b>Tresurer --</b> Manasa Lingireddy<br/>"
+        "<br/>"
+        "<a href=\"https://www.facebook.com/uwindians \">https://www.facebook.com/uwindians</a><br/>"
+        "<a href=\"https://www.instagram.com/uwisa/\" >https://www.instagram.com/uwisa/</a><br/>"
+        
+        )
 
         # create the QR code
-        url = pyqrcode.create("google.com")
+        url = pyqrcode.create("https://greasy-cable-production.up.railway.app/getUserDetails/" + request.form['uuid'])
         imageName = request.form['uuid'] + ".png"
         url.png(imageName, scale=10)
         message = create_message_with_attachment("kumararoosh@gmail.com", 
-        request.form['email'], "Diya Ticket: " + request.form['name'], body, imageName)
+        request.form['email'], "Diya Ticket: " + request.form['name'], body, [imageName, "Disclaimer.pdf"])
         send_message(service, "me", message)
         
         os.remove(imageName)
@@ -102,31 +115,34 @@ def create_message(sender, to, subject, message_text):
         'raw': raw_message.decode("utf-8")
     }
 
-def create_message_with_attachment(sender, to, subject, message_text, file):
+def create_message_with_attachment(sender, to, subject, message_text, files):
     message = MIMEMultipart()
     message['to'] = to
     message['from'] = sender
     message['subject'] = subject
-    msg = MIMEText(message_text)
+    msg = MIMEText(message_text, 'html')
     message.attach(msg)
-    content_type, encoding = mimetypes.guess_type(file)
 
-    if content_type is None or encoding is not None:
-        content_type = 'application/octet-stream'
+    for file in files:       
+        content_type, encoding = mimetypes.guess_type(file)
 
-    main_type, sub_type = content_type.split('/', 1)
-    if main_type == 'image':
-        fp = open(file, 'rb')
-        msg = MIMEImage(fp.read(), _subtype=sub_type)
-        fp.close()
-    else:
-        fp = open(file, 'rb')
-        msg = MIMEBase(main_type, sub_type)
-        msg.set_payload(fp.read())
-        fp.close()
-    filename = os.path.basename(file)
-    msg.add_header('Content-Disposition', 'attachment', filename=filename)
-    message.attach(msg)
+        if content_type is None or encoding is not None:
+            content_type = 'application/octet-stream'
+
+        main_type, sub_type = content_type.split('/', 1)
+        if main_type == 'image':
+            fp = open(file, 'rb')
+            msg = MIMEImage(fp.read(), _subtype=sub_type)
+            fp.close()
+        else:
+            fp = open(file, 'rb')
+            msg = MIMEBase(main_type, sub_type)
+            msg.set_payload(fp.read())
+            email.encoders.encode_base64(msg)
+            fp.close()
+        filename = os.path.basename(file)
+        msg.add_header('Content-Disposition', 'attachment', filename=filename)
+        message.attach(msg)
     raw_message = base64.urlsafe_b64encode(message.as_string().encode("utf-8"))
     return {'raw': raw_message.decode("utf-8")}
 
