@@ -72,10 +72,13 @@ def main():
 
 
         body = ("Hi " + request.form['name'] + ",<br/><br/> Thank you for purchasing a ticket to Diya!<br/>"
-        "Diya will take place on November 5th from 9 PM to 12:30 AM! "
-        "Our event will be at <a href=\"https://goo.gl/maps/UQxArPCTKEWTHQKh8\">First & Bell</a><br/>"
-        "Please take note and read through the Disclaimer provided. Your ticket is the attached QR Code.<br/>"
-        "Thank you for purchasing and we hope you enjoy the event!<br/>"
+        "Please ensure you read everything in this email carefully. In order to enter the event, you will need to present this email and the QR Code attachment.<br/><br/>"
+        "<b>ITEMS TO BRING TO DIYA</b><br/>"
+        "<ol><li>Husky Card (for UW Students) or US State/Government issued ID (for non-UW Students)</li><li>This confirmation email with the QR Code Attached</li></ol><br/>"
+        "<b>ABOUT THE EVENT</b><br/>"
+        "<ul><li>WHEN: November 5th, 2022 from 9 PM to 12:30 AM</li><li>WHERE: <a href=\"https://goo.gl/maps/UQxArPCTKEWTHQKh8\">First & Bell</a> (2218 1st Ave, Seattle, WA 98121)</li><li>DRESS: Traditional Indian clothes reccommended</li></ul><br/>"
+
+        "<b>PLEASE BE AWARE, BY ACCEPTING THIS TICKET YOU AGREE TO THE DISCLAIMER ATTACHED IN THE EMAIL</b><br/>"
         "--<br/>"
         "<b>2022-2023 Indian Student Association Executive Officers</b><br/><br/>"
         "<b>President --</b> Aroosh Kumar<br/>"
@@ -84,9 +87,7 @@ def main():
         "<b>Tresurer --</b> Manasa Lingireddy<br/>"
         "<br/>"
         "<a href=\"https://www.facebook.com/uwindians \">https://www.facebook.com/uwindians</a><br/>"
-        "<a href=\"https://www.instagram.com/uwisa/\" >https://www.instagram.com/uwisa/</a><br/>"
-        
-        )
+        "<a href=\"https://www.instagram.com/uwisa/\" >https://www.instagram.com/uwisa/</a><br/>")
 
         # create the QR code
         url = pyqrcode.create("https://greasy-cable-production.up.railway.app/getUserDetails/" + request.form['uuid'])
